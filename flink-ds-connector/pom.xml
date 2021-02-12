@@ -14,6 +14,7 @@
         <flink.version>1.12.1</flink.version>
         <scala.binary.version>2.12</scala.binary.version>
         <log4j.version>2.13.3</log4j.version>
+        <mysql-connector-java.version>8.0.22</mysql-connector-java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -31,6 +32,16 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-jdbc_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql-connector-java.version}</version>
         </dependency>
 
         <dependency>
