@@ -3,10 +3,8 @@ package com.hiscat.flink.ds.connector.kafka
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer.Semantic
 
-import java.util.Properties
-
+//https://ci.apache.org/projects/flink/flink-docs-release-1.12/dev/connectors/kafka.html
 object FlinkKafkaProducerTest {
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment

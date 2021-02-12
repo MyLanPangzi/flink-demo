@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 
 import java.util.Properties
 
+//https://ci.apache.org/projects/flink/flink-docs-release-1.12/dev/connectors/kafka.html
 object FlinkKafkaConsumerTest {
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
