@@ -1,5 +1,7 @@
 # flink-demo
 
+minimum code just run
+
 ## flink-ds-connector
 
 DataStream API usage
@@ -17,3 +19,15 @@ DataStream API usage
 ## flink-sql-connector
 
 SQL usage
+
+*  [ print](./flink-sql-connector/src/main/resources/sql/print.sql )
+*  [ datagen](./flink-sql-connector/src/main/resources/sql/datagen.sql )
+
+### how to run sql
+
+* cd flink-sql-parser
+* mvn install -Dskip.Tests
+* run [ SqlJobSubmitter](./flink-sql-connector/src/main/scala/com/hiscat/flink/sql/connector/SqlJobSubmitter.scala )
+   *  with --sql.path your sql file path
+
+![ how to run sql](./image/how-to-run-sql.png )
