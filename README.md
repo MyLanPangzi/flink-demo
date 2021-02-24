@@ -22,6 +22,8 @@ SQL usage
 
 *  [ print](./flink-sql-connector/src/main/resources/sql/print.sql )
 *  [ datagen](./flink-sql-connector/src/main/resources/sql/datagen.sql )
+*  jdbc
+    *  [ scan ](./flink-sql-connector/src/main/resources/sql/jdbc_scan.sql )
 
 ### how to run sql
 
