@@ -12,3 +12,29 @@ SET table.local-time-zone=Asia/Shanghai;
 -- SET table.dynamic-table-options.enabled=true;
 -- SET table.sql-dialect=hive;
 
+CREATE TABLE test
+(
+    id          BIGINT,
+    name        STRING,
+    ts          BIGINT,
+    `timestamp` TIMESTAMP(3) METADATA ,
+    `headers` 	MAP<STRING, BYTES> METADATA
+) WITH (
+  'connector' = 'kafka',
+  'topic' = 'test',
+  'properties.bootstrap.servers' = 'yh001:9092',
+  'properties.group.id' = 'testGroup',
+  'format' = 'csv'
+);
+
+CREATE TABLE datagen WITH (
+      'connector' = 'datagen',
+      'rows-per-second' = '1',
+      'fields.id.min' = '1',
+      'fields.id.max' = '90000',
+      'fields.name.length' = '6'
+) LIKE test (EXCLUDING ALL);
+
+INSERT INTO test
+SELECT id, name, UNIX_TIMESTAMP() * 1000, PROCTIME(), MAP['hello', ENCODE('wolrd','UTF-8')]
+FROM datagen;
