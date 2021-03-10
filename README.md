@@ -27,6 +27,9 @@ SQL usage
     *  [ lookup ](./flink-sql-connector/src/main/resources/sql/jdbc_lookup.sql )
     *  [ batch sink ](./flink-sql-connector/src/main/resources/sql/jdbc_batch_sink.sql )
     *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/jdbc_streaming_sink.sql )
+*  es
+    *  [ batch sink ](./flink-sql-connector/src/main/resources/sql/es6_batch_sink.sql )
+    *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/es6_streaming_sink.sql )
 
 ### how to run sql
 

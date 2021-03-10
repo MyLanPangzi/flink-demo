@@ -14,10 +14,13 @@ object SqlCommandParser {
     val bytes = new Array[Byte](stream.available())
     IOUtils.readFully(stream, bytes, 0, bytes.length)
     val text = new String(bytes)
-    text.split(";")
+    text
+      .split("\n")
+      .filterNot(_.startsWith("--"))
+      .mkString("\n")
+      .split(";")
       .map(_.trim.replace("；", ";"))
       .filter(_.nonEmpty)
-      .filterNot(_.startsWith("--"))
       .map {
         case e if e.startsWith("INSERT") => DmlCommand(e)
         case e if e.startsWith("CREATE") => DdlCommand(e)
