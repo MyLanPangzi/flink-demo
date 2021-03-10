@@ -21,6 +21,7 @@ DataStream API usage
 SQL usage
 
 *  [ print](./flink-sql-connector/src/main/resources/sql/print.sql )
+*  [ blackhole](./flink-sql-connector/src/main/resources/sql/blackhole.sql )
 *  [ datagen](./flink-sql-connector/src/main/resources/sql/datagen.sql )
 *  jdbc
     *  [ scan ](./flink-sql-connector/src/main/resources/sql/jdbc_scan.sql )
@@ -30,6 +31,11 @@ SQL usage
 *  es
     *  [ batch sink ](./flink-sql-connector/src/main/resources/sql/es6_batch_sink.sql )
     *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/es6_streaming_sink.sql )
+*  hbase
+    *  [ lookup ](./flink-sql-connector/src/main/resources/sql/hbase_lookup_source.sql )
+    *  [ scan ](./flink-sql-connector/src/main/resources/sql/hbase_scan_source.sql )
+    *  [ batch sink ](./flink-sql-connector/src/main/resources/sql/hbase_batch_sink.sql )
+    *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/hbase_streaming_sink.sql )
 
 ### how to run sql
 
