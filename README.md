@@ -36,6 +36,9 @@ SQL usage
     *  [ scan ](./flink-sql-connector/src/main/resources/sql/hbase_scan_source.sql )
     *  [ batch sink ](./flink-sql-connector/src/main/resources/sql/hbase_batch_sink.sql )
     *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/hbase_streaming_sink.sql )
+*  kafka
+    *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/kafka_streaming_sink.sql )
+    *  [ streaming source ](./flink-sql-connector/src/main/resources/sql/kafka_streaming_source.sql )
 
 ### how to run sql
 
