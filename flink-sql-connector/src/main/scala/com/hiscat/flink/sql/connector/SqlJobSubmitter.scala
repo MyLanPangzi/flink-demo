@@ -11,6 +11,7 @@ object SqlJobSubmitter {
   def main(args: Array[String]): Unit = {
     val tool = ParameterTool.fromArgs(args)
     val env = StreamExecutionEnvironment.getExecutionEnvironment
+    env.enableCheckpointing(10*1000)
     val tEnv = StreamTableEnvironment.create(env)
     if (!tool.has(SQL_PATH)) {
       return

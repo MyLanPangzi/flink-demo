@@ -42,6 +42,8 @@ SQL usage
 *  upsert-kafka
     *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/upsert_kafka_streaming_sink.sql )
     *  [ scan source ](./flink-sql-connector/src/main/resources/sql/upsert_kafka_scan_source.sql )
+*  filesystem
+    *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/fs_streaming_sink.sql )
 
 ### how to run sql
 
