@@ -1,3 +1,4 @@
+-- https://ci.apache.org/projects/flink/flink-docs-release-1.12/dev/table/connectors/jdbc.html
 -- insert into users (id, name) values (1,'hello'),(2,'world');
 CREATE TABLE users
 (

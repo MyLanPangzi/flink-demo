@@ -1,3 +1,4 @@
+-- https://ci.apache.org/projects/flink/flink-docs-release-1.12/dev/table/connectors/kafka.html
 CREATE TABLE test
 (
     id          BIGINT,
@@ -25,5 +26,5 @@ CREATE TABLE datagen WITH (
                          ) LIKE test (EXCLUDING ALL);
 
 INSERT INTO test
-SELECT id, name, UNIX_TIMESTAMP() * 1000, PROCTIME(), MAP['hello', ENCODE('wolrd', 'UTF-8') ]
+SELECT id, name, UNIX_TIMESTAMP() * 1000, PROCTIME(), MAP['hello', ENCODE('world', 'UTF-8') ]
 FROM datagen;

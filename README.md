@@ -38,7 +38,10 @@ SQL usage
     *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/hbase_streaming_sink.sql )
 *  kafka
     *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/kafka_streaming_sink.sql )
-    *  [ streaming source ](./flink-sql-connector/src/main/resources/sql/kafka_streaming_source.sql )
+    *  [ scan source ](./flink-sql-connector/src/main/resources/sql/kafka_scan_source.sql )
+*  upsert-kafka
+    *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/upsert_kafka_streaming_sink.sql )
+    *  [ scan source ](./flink-sql-connector/src/main/resources/sql/upsert_kafka_scan_source.sql )
 
 ### how to run sql
 

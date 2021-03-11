@@ -11,3 +11,4 @@ SET table.local-time-zone=Asia/Shanghai;
 -- SET table.generated-code.max-length=64000;
 -- SET table.dynamic-table-options.enabled=true;
 -- SET table.sql-dialect=hive;
+
