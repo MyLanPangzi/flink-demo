@@ -1,6 +1,6 @@
 package com.hiscat.flink.custrom.connector.json.ogg;
 
-import com.yonghui.datacenter.platform.flink.formats.json.JsonRowDataSerializationSchema;
+import com.hiscat.flink.custrom.connector.json.JsonRowDataSerializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.formats.json.JsonOptions;
 import org.apache.flink.formats.json.TimestampFormat;

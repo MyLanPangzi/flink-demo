@@ -1,6 +1,7 @@
 package com.hiscat.flink.custrom.connector.json.ogg;
 
-import com.yonghui.datacenter.platform.flink.formats.json.JsonRowDataDeserializationSchema;
+import com.hiscat.flink.custrom.connector.json.ogg.OggJsonDecodingFormat.ReadableMetadata;
+import com.hiscat.flink.custrom.connector.json.JsonRowDataDeserializationSchema;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -23,7 +24,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.yonghui.datacenter.platform.flink.formats.json.ogg.OggJsonDecodingFormat.*;
+import static com.hiscat.flink.custrom.connector.json.ogg.OggJsonDecodingFormat.*;
 import static java.lang.String.format;
 
 /**

@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.yonghui.datacenter.platform.flink.formats.json.TimeFormats.*;
+import static com.hiscat.flink.custrom.connector.json.TimeFormats.*;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 /** Tool class used to convert from {@link JsonNode} to {@link RowData}. * */

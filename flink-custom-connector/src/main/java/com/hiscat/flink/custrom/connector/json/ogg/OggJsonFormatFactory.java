@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.yonghui.datacenter.platform.flink.formats.json.JsonOptions.ENCODE_DECIMAL_AS_PLAIN_NUMBER;
-import static com.yonghui.datacenter.platform.flink.formats.json.ogg.OggJsonOptions.*;
+import static com.hiscat.flink.custrom.connector.json.JsonOptions.ENCODE_DECIMAL_AS_PLAIN_NUMBER;
+import static com.hiscat.flink.custrom.connector.json.ogg.OggJsonOptions.*;
 
 /**
  * Format factory for providing configured instances of OGG JSON to RowData {@link
