@@ -49,7 +49,7 @@ SQL usage
 
 * cd flink-sql-parser
 * mvn install -Dskip.Tests
-* run [ SqlJobSubmitter](./flink-sql-connector/src/main/scala/com/hiscat/flink/sql/connector/SqlJobSubmitter.scala )
+* run [ SqlTest ](./flink-sql-connector/src/main/scala/com/hiscat/flink/sql/connector/SqlTest.scala )
    *  with --sql.path your sql file path
 
 ![ how to run sql](./image/how-to-run-sql.png )
