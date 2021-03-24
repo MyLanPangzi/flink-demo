@@ -6,12 +6,12 @@ import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 
 object SqlJobSubmitter {
-    val SQL_PATH = "sql.path"
+  val SQL_PATH = "sql.path"
 
   def main(args: Array[String]): Unit = {
     val tool = ParameterTool.fromArgs(args)
     val env = StreamExecutionEnvironment.getExecutionEnvironment
-    env.enableCheckpointing(10*1000)
+    env.enableCheckpointing(10 * 1000)
     val tEnv = StreamTableEnvironment.create(env)
     if (!tool.has(SQL_PATH)) {
       return
