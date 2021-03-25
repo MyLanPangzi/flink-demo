@@ -32,4 +32,4 @@ CREATE TABLE print(
 
 -- first, comment this
 -- INSERT INTO print SELECT * FROM t1;
--- uncomment above sql after insert
+-- uncomment above sql after insert, running again
