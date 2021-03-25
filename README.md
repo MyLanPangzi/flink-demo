@@ -44,10 +44,15 @@ SQL usage
     *  [ scan source ](./flink-sql-connector/src/main/resources/sql/upsert_kafka_scan_source.sql )
 *  filesystem
     *  [ streaming sink ](./flink-sql-connector/src/main/resources/sql/fs_streaming_sink.sql )
+*  hudi
+    *  you need build hudi and local install
+    *  be careful the File.separator, replace with Path.SEPARATOR only for windows
+    *  [ batch sink and read ](./flink-hudi-test/src/main/resources/batch_sink_read.sql )
 
 ### how to run sql
 
 * cd flink-sql-parser
+* cd ../flink-sql-submitter
 * mvn install -Dskip.Tests
 * run [ SqlTest ](./flink-sql-connector/src/main/scala/com/hiscat/flink/sql/connector/SqlTest.scala )
    *  with --sql.path your sql file path

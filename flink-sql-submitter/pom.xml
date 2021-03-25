@@ -11,12 +11,13 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <flink.version>1.12.2</flink.version>
+        <flink.version>1.11.3</flink.version>
         <scala.binary.version>2.11</scala.binary.version>
+        <scala-maven-plugin.version>4.4.0</scala-maven-plugin.version>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>com.hiscat</groupId>
+            <groupId>com.hiscat.flink</groupId>
             <artifactId>flink-sql-parser</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -33,4 +34,16 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>${scala-maven-plugin.version}</version>
+                <configuration>
+                    <scalaCompatVersion>2.11</scalaCompatVersion>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -6,7 +6,9 @@ import org.apache.flink.core.fs.{FileSystem, Path}
 import org.apache.flink.util.IOUtils
 
 object SqlCommandParser {
-
+  def main(args: Array[String]): Unit = {
+    getCommands("E:/github/flink-demo/flink-hudi-test/src/main/resources/test.sql ")
+  }
   def getCommands(path: String): Seq[SqlCommand] = {
     val uri = URI.create(path)
     val fs = FileSystem.get(uri)
