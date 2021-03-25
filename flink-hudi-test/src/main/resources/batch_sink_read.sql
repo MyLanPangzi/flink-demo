@@ -30,4 +30,6 @@ CREATE TABLE print(
                       `partition` VARCHAR(20)
 ) WITH('connector'='print');
 
-INSERT INTO print SELECT * FROM t1;
+-- first, comment this
+-- INSERT INTO print SELECT * FROM t1;
+-- uncomment above sql after insert
