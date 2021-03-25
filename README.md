@@ -52,6 +52,7 @@ SQL usage
 ### how to run sql
 
 * cd flink-sql-parser
+* mvn install -Dskip.Tests
 * cd ../flink-sql-submitter
 * mvn install -Dskip.Tests
 * run [ SqlTest ](./flink-sql-connector/src/main/scala/com/hiscat/flink/sql/connector/SqlTest.scala )
