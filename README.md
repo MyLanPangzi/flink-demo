@@ -48,6 +48,9 @@ SQL usage
     *  you need build hudi and local install
     *  be careful the File.separator, replace with Path.SEPARATOR only for windows
     *  [ batch sink and read ](./flink-hudi-test/src/main/resources/batch_sink_read.sql )
+    *  [ streaming sink and read ](./flink-hudi-test/src/main/resources/streaming_sink_and_read.sql )
+    *  [ cdc  ](./flink-hudi-test/src/main/resources/mysql_cdc_test.sql )
+    *  [ cdc docs ](./docs/增量型数仓探索：Flink + Hudi.md )
 
 ### how to run sql
 
