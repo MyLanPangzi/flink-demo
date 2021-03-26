@@ -45,4 +45,4 @@ INSERT INTO hudi_users SELECT *, DATE_FORMAT(birthday, 'yyyy/MM/dd') FROM mysql_
 
 -- first, comment this, uncomment after insert, running again
 -- INSERT INTO print SELECT * FROM mysql_users;
-INSERT INTO print SELECT * FROM hudi_users;
+-- INSERT INTO print SELECT * FROM hudi_users;

@@ -21,17 +21,17 @@
 
     <!-- 配置该hadoop(superUser)允许通过代理访问的主机节点 -->
     <property>
-        <name>hadoop.proxyuser.root.hosts</name>
+        <name>hadoop.proxyuser.hdp.hosts</name>
         <value>*</value>
     </property>
     <!-- 配置该hadoop(superUser)允许通过代理用户所属组 -->
     <property>
-        <name>hadoop.proxyuser.root.groups</name>
+        <name>hadoop.proxyuser.hdp.groups</name>
         <value>*</value>
     </property>
     <!-- 配置该hadoop(superUser)允许通过代理的用户-->
     <property>
-        <name>hadoop.proxyuser.root.groups</name>
+        <name>hadoop.proxyuser.hdp.groups</name>
         <value>*</value>
     </property>
 </configuration>
