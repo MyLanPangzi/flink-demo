@@ -12,38 +12,52 @@ SET table.local-time-zone=Asia/Shanghai;
 -- SET table.dynamic-table-options.enabled=true;
 -- SET table.sql-dialect=hive;
 
-CREATE TABLE t1
+CREATE TABLE mysql_users (
+      id BIGINT PRIMARY KEY NOT ENFORCED ,
+      name STRING,
+      birthday TIMESTAMP(3),
+      ts TIMESTAMP(3)
+) WITH (
+ 'connector' = 'mysql-cdc',
+ 'hostname' = 'yh002',
+ 'port' = '3306',
+ 'username' = 'root',
+ 'password' = 'Yh002Yh002@',
+ 'server-time-zone' = 'Asia/Shanghai',
+ 'database-name' = 'flink',
+ 'table-name' = 'users'
+);
+
+
+CREATE TABLE hudi_users
 (
-    uuid        VARCHAR(20),
-    name        VARCHAR(10),
-    age         INT,
-    ts          TIMESTAMP(3),
+    id BIGINT PRIMARY KEY NOT ENFORCED,
+    name STRING,
+    birthday TIMESTAMP(3),
+    ts TIMESTAMP(3),
     `partition` VARCHAR(20)
 ) PARTITIONED BY (`partition`) WITH (
     'connector' = 'hudi',
-    'path' = 'hdfs://yh001:9820/hudi/t1',
+    'table.type' = 'MERGE_ON_READ',
+    'path' = 'hdfs://yh001:9820/hudi/hudi_users',
     'write.tasks' = '1',
-    'read.tasks' = '1'
+    'read.tasks' = '1',
+    'read.streaming.enabled' = 'true',
+    'read.streaming.check-interval' = '1'
 );
 
-INSERT INTO t1
-VALUES ('id1', 'Danny', 23, TIMESTAMP '1970-01-01 00:00:01', '2021/03/25'),
-       ('id2', 'Stephen', 33, TIMESTAMP '1970-01-01 00:00:02', '2021/03/24'),
-       ('id3', 'Julian', 53, TIMESTAMP '1970-01-01 00:00:03', '2021/03/23'),
-       ('id4', 'Fabian', 31, TIMESTAMP '1970-01-01 00:00:04', '2021/03/25'),
-       ('id5', 'Sophia', 18, TIMESTAMP '1970-01-01 00:00:05', '2021/03/24'),
-       ('id6', 'Emma', 20, TIMESTAMP '1970-01-01 00:00:06', '2021/03/23'),
-       ('id7', 'Bob', 44, TIMESTAMP '1970-01-01 00:00:07', '2021/03/25'),
-       ('id8', 'Han', 56, TIMESTAMP '1970-01-01 00:00:08', '2021/03/24');
 
-CREATE TABLE print(
-                      uuid        VARCHAR(20),
-                      name        VARCHAR(10),
-                      age         INT,
-                      ts          TIMESTAMP(3),
-                      `partition` VARCHAR(20)
+CREATE TABLE print
+(
+    id BIGINT PRIMARY KEY NOT ENFORCED,
+    name STRING,
+    birthday TIMESTAMP(3),
+    ts TIMESTAMP(3),
+    `partition` VARCHAR(20)
 ) WITH('connector'='print');
 
--- first, comment this
--- INSERT INTO print SELECT * FROM t1;
--- uncomment above sql after insert, running again
+INSERT INTO hudi_users SELECT *, DATE_FORMAT(birthday, 'yyyy/MM/dd') FROM mysql_users;
+
+-- first, comment this, uncomment after insert, running again
+-- INSERT INTO print SELECT * FROM mysql_users;
+INSERT INTO print SELECT * FROM hudi_users;

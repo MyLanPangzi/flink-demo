@@ -2,6 +2,6 @@
 --user hdp \
 --pass '' \
 --partitioned-by partition \
---base-path hdfs://yh001:9820/hudi/t2 \
+--base-path hdfs://yh001:9820/hudi/hudi_users \
 --database default \
---table t2
+--table hudi_users
