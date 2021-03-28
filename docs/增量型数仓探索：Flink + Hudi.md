@@ -7,11 +7,12 @@
 
 我的开发环境：
 * OS: win10
-* jdk: Java(TM) SE Runtime Environment (build 1.8.0_202-b08)
-  Java HotSpot(TM) 64-Bit Server VM (build 25.202-b08, mixed mode)
+* idea: 2020.3.3最终版
+* jdk: 1.8.0_202-b08
 * maven: apache-maven-3.6.3，注意配置自己的加速镜像
 * scala: 2.11.12
-* idea: 2020.3.3最终版
+* flink: 1.12.2
+* hudi: master分支
 
 ## 准备工作
 
@@ -128,6 +129,8 @@ delete from users where id = 5;
 
 ### 导入hive
 
+* 这个jar包需要在hive/lib下或者aux jars路径：hudi-hadoop-mr-bundle-x.y.z-SNAPSHOT.jar
+* 参考链接：http://hudi.apache.org/docs/querying_data.html#hive
 * 上传脚本，脚本用我修改过的，每个hive版本的依赖不一样，需要根据报错信息具体修改。
 * [ run_sync_tool ](../flink-hudi-test/src/main/resources/run_sync_tool.sh)
   * 加了calcite, libfb303依赖
