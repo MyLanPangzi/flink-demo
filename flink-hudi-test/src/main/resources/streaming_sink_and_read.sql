@@ -1,3 +1,4 @@
+--sql.path /Users/xiebo/IdeaProjects/flink-demo/flink-hudi-test/src/main/resources/streaming_sink_and_read.sql
 CREATE TABLE t2
 (
     uuid        VARCHAR(20),
@@ -8,7 +9,7 @@ CREATE TABLE t2
 ) PARTITIONED BY (`partition`) WITH (
     'connector' = 'hudi',
     'table.type' = 'MERGE_ON_READ',
-    'path' = 'hdfs://yh001:9820/hudi/t2',
+    'path' = 'hdfs://dev:9000/hudi/t2',
     'write.tasks' = '1',
     'read.tasks' = '1',
     'read.streaming.enabled' = 'true',

@@ -1,3 +1,5 @@
+--sql.path /Users/xiebo/IdeaProjects/flink-demo/flink-hudi-test/src/main/resources/batch_sink_read.sql
+
 CREATE TABLE t1
 (
     uuid        VARCHAR(20),
@@ -7,7 +9,7 @@ CREATE TABLE t1
     `partition` VARCHAR(20)
 ) PARTITIONED BY (`partition`) WITH (
     'connector' = 'hudi',
-    'path' = 'hdfs://yh001:9820/hudi/',
+    'path' = 'hdfs://dev:9000/hudi/t1',
     'write.tasks' = '1',
     'read.tasks' = '1'
 );
@@ -31,5 +33,5 @@ CREATE TABLE print(
 ) WITH('connector'='print');
 
 -- first, comment this
--- INSERT INTO print SELECT * FROM t1;
+INSERT INTO print SELECT * FROM t1;
 -- uncomment above sql after insert, running again

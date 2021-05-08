@@ -5,7 +5,7 @@
     <!-- 指定NameNode的地址 -->
     <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://yh001:9820</value>
+        <value>hdfs://dev:9820</value>
     </property>
     <!-- 指定hadoop数据的存储目录 -->
     <property>

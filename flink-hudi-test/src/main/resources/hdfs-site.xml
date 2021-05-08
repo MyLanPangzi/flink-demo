@@ -20,13 +20,13 @@
     <!-- nn web端访问地址-->
     <property>
         <name>dfs.namenode.http-address</name>
-        <value>yh001:9870</value>
+        <value>dev:9870</value>
     </property>
 
     <!-- 2nn web端访问地址-->
     <property>
         <name>dfs.namenode.secondary.http-address</name>
-        <value>yh003:9868</value>
+        <value>dev:9868</value>
     </property>
 
     <!-- 测试环境指定HDFS副本的数量1 -->
