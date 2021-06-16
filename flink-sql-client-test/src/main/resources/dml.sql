@@ -1,0 +1,9 @@
+BEGIN STATEMENT SET;
+
+INSERT INTO KafkaTable
+SELECT * FROM dg;
+
+INSERT INTO print
+SELECT * FROM KafkaTable;
+
+END;
