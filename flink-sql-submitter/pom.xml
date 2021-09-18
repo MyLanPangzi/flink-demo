@@ -15,6 +15,7 @@
         <scala.binary.version>2.11</scala.binary.version>
         <scala-maven-plugin.version>4.4.0</scala-maven-plugin.version>
         <hadoop.version>3.1.4</hadoop.version>
+        <lombok.version>1.18.20</lombok.version>
     </properties>
     <dependencies>
         <dependency>
@@ -34,6 +35,13 @@
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+
 <!--        <dependency>-->
 <!--            <groupId>org.apache.iceberg</groupId>-->
 <!--            <artifactId>iceberg-flink</artifactId>-->
