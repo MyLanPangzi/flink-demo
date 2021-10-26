@@ -19,11 +19,6 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>com.hiscat.flink</groupId>
-            <artifactId>flink-sql-parser</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
@@ -42,18 +37,6 @@
             <version>${lombok.version}</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.apache.iceberg</groupId>-->
-<!--            <artifactId>iceberg-flink</artifactId>-->
-<!--            <version>0.12.0-SNAPSHOT</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-            <version>${hadoop.version}</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
