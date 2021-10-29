@@ -1,9 +1,9 @@
 package com.hiscat.flink.custrom.connector.json.ogg;
 
+import com.hiscat.flink.custrom.connector.json.JsonOptions;
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ConfigOptions;
 import org.apache.flink.configuration.ReadableConfig;
-import org.apache.flink.formats.json.JsonOptions;
 
 /** Option utils for canal-json format. */
 public class OggJsonOptions {

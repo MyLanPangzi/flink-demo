@@ -1,9 +1,10 @@
 package com.hiscat.flink.custrom.connector.json.ogg;
 
+import com.hiscat.flink.custrom.connector.json.JsonOptions;
 import com.hiscat.flink.custrom.connector.json.JsonRowDataSerializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
-import org.apache.flink.formats.json.JsonOptions;
-import org.apache.flink.formats.json.TimestampFormat;
+import org.apache.flink.formats.common.TimestampFormat;
+import org.apache.flink.formats.json.JsonFormatOptions;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.data.*;
 import org.apache.flink.table.types.DataType;
@@ -37,7 +38,7 @@ public class OggJsonSerializationSchema implements SerializationSchema<RowData> 
     public OggJsonSerializationSchema(
             RowType rowType,
             TimestampFormat timestampFormat,
-            JsonOptions.MapNullKeyMode mapNullKeyMode,
+            JsonFormatOptions.MapNullKeyMode mapNullKeyMode,
             String mapNullKeyLiteral,
             boolean encodeDecimalAsPlainNumber) {
         jsonSerializer =

@@ -1,11 +1,12 @@
 package com.hiscat.flink.custrom.connector.json.ogg;
 
+import com.hiscat.flink.custrom.connector.json.JsonOptions;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ReadableConfig;
-import org.apache.flink.formats.json.JsonOptions;
-import org.apache.flink.formats.json.TimestampFormat;
+import org.apache.flink.formats.common.TimestampFormat;
+import org.apache.flink.formats.json.JsonFormatOptions;
 import org.apache.flink.table.connector.ChangelogMode;
 import org.apache.flink.table.connector.format.DecodingFormat;
 import org.apache.flink.table.connector.format.EncodingFormat;
@@ -57,7 +58,8 @@ public class OggJsonFormatFactory
         validateEncodingFormatOptions(formatOptions);
 
         TimestampFormat timestampFormat = JsonOptions.getTimestampFormat(formatOptions);
-        JsonOptions.MapNullKeyMode mapNullKeyMode = JsonOptions.getMapNullKeyMode(formatOptions);
+
+        final JsonFormatOptions.MapNullKeyMode mapNullKeyMode = JsonFormatOptions.MapNullKeyMode.valueOf(formatOptions.get(JSON_MAP_NULL_KEY_LITERAL));
         String mapNullKeyLiteral = formatOptions.get(JSON_MAP_NULL_KEY_LITERAL);
 
         final boolean encodeDecimalAsPlainNumber = formatOptions.get(ENCODE_DECIMAL_AS_PLAIN_NUMBER);
@@ -77,6 +79,7 @@ public class OggJsonFormatFactory
             public SerializationSchema<RowData> createRuntimeEncoder(
                     DynamicTableSink.Context context, DataType consumedDataType) {
                 final RowType rowType = (RowType) consumedDataType.getLogicalType();
+
                 return new OggJsonSerializationSchema(
                         rowType,
                         timestampFormat,

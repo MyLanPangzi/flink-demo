@@ -3,7 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <parent>
+        <groupId>com.hiscat</groupId>
+        <artifactId>flink-demo</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
     <groupId>com.hiscat.flink.cdc</groupId>
     <artifactId>flink-cdc-test</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -12,8 +17,6 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <flink.version>1.13.2</flink.version>
-        <scala.binary.version>2.11</scala.binary.version>
-        <lombok.version>1.18.20</lombok.version>
         <log4j.version>2.14.1</log4j.version>
     </properties>
     <dependencies>
