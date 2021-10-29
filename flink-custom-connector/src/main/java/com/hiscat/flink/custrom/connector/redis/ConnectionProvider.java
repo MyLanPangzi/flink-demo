@@ -10,6 +10,7 @@ public class ConnectionProvider {
             .withHost(options.getHost())
             .withPort(options.getPort())
             .build();
+        redisUri.setPassword(options.getPassword());
 //        if (options.getPassword() != null) {
 //            redisUri.setPassword(DESUtils.decryptFromBase64(options.getPassword()));
 //        }
