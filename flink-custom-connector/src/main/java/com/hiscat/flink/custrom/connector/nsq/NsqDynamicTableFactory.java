@@ -21,7 +21,7 @@ public class NsqDynamicTableFactory implements DynamicTableSinkFactory, DynamicT
 
     @Override
     public String factoryIdentifier() {
-        return "iaa-nsq";
+        return "nsq";
     }
 
     @Override

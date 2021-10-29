@@ -43,7 +43,7 @@ public class RedisDynamicTableFactory implements DynamicTableSourceFactory {
 
     @Override
     public String factoryIdentifier() {
-        return "iaa-redis";
+        return "redis";
     }
 
     @Override
