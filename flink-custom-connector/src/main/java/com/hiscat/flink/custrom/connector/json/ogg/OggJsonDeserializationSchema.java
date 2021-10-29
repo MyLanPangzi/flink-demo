@@ -24,7 +24,6 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.hiscat.flink.custrom.connector.json.ogg.OggJsonDecodingFormat.*;
 import static java.lang.String.format;
 
 /**
@@ -142,7 +141,7 @@ public final class OggJsonDeserializationSchema implements DeserializationSchema
     /**
      * A builder for creating a {@link OggJsonDeserializationSchema}.
      */
-    @Internal
+//    @Internal
     public static final class Builder {
         private final DataType physicalDataType;
         private final List<ReadableMetadata> requestedMetadata;
@@ -196,7 +195,7 @@ public final class OggJsonDeserializationSchema implements DeserializationSchema
     // ------------------------------------------------------------------------------------------
 
     @Override
-    public RowData deserialize(byte[] message) throws IOException {
+    public RowData deserialize(byte[] message) {
         throw new RuntimeException(
                 "Please invoke DeserializationSchema#deserialize(byte[], Collector<RowData>) instead.");
     }
@@ -355,7 +354,8 @@ public final class OggJsonDeserializationSchema implements DeserializationSchema
      * Converter that extracts a metadata field from the row that comes out of the JSON schema and
      * converts it to the desired data type.
      */
-    interface MetadataConverter extends Serializable {
+//    interface MetadataConverter extends Serializable {
+    interface MetadataConverter {
 
         // Method for top-level access.
         default Object convert(GenericRowData row) {
