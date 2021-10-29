@@ -1,4 +1,4 @@
-package com.hiscat.flink.custrom.connector.json;
+package com.hiscat.flink.custrom.format.json;
 
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ConfigOptions;

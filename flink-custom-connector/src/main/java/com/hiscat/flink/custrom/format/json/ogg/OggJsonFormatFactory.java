@@ -1,6 +1,6 @@
-package com.hiscat.flink.custrom.connector.json.ogg;
+package com.hiscat.flink.custrom.format.json.ogg;
 
-import com.hiscat.flink.custrom.connector.json.JsonOptions;
+import com.hiscat.flink.custrom.format.json.JsonOptions;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.configuration.ConfigOption;
@@ -24,8 +24,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.hiscat.flink.custrom.connector.json.JsonOptions.ENCODE_DECIMAL_AS_PLAIN_NUMBER;
-import static com.hiscat.flink.custrom.connector.json.ogg.OggJsonOptions.*;
+import static com.hiscat.flink.custrom.format.json.JsonOptions.ENCODE_DECIMAL_AS_PLAIN_NUMBER;
+import static com.hiscat.flink.custrom.format.json.ogg.OggJsonOptions.*;
 
 /**
  * Format factory for providing configured instances of OGG JSON to RowData {@link

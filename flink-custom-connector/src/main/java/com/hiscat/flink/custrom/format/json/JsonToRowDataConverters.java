@@ -1,4 +1,4 @@
-package com.hiscat.flink.custrom.connector.json;
+package com.hiscat.flink.custrom.format.json;
 
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.formats.common.TimestampFormat;
@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.hiscat.flink.custrom.connector.json.TimeFormats.*;
+import static com.hiscat.flink.custrom.format.json.TimeFormats.*;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 /** Tool class used to convert from {@link JsonNode} to {@link RowData}. * */

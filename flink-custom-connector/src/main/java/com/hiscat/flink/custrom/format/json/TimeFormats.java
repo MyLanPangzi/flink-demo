@@ -1,5 +1,5 @@
 
-package com.hiscat.flink.custrom.connector.json;
+package com.hiscat.flink.custrom.format.json;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;

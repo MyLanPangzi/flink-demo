@@ -1,8 +1,7 @@
-package com.hiscat.flink.custrom.connector.json.ogg;
+package com.hiscat.flink.custrom.format.json.ogg;
 
-import com.hiscat.flink.custrom.connector.json.ogg.OggJsonDecodingFormat.ReadableMetadata;
-import com.hiscat.flink.custrom.connector.json.JsonRowDataDeserializationSchema;
-import org.apache.flink.annotation.Internal;
+import com.hiscat.flink.custrom.format.json.ogg.OggJsonDecodingFormat.ReadableMetadata;
+import com.hiscat.flink.custrom.format.json.JsonRowDataDeserializationSchema;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.formats.common.TimestampFormat;
@@ -18,7 +17,6 @@ import org.apache.flink.util.Collector;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;

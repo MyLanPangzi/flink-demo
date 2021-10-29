@@ -1,6 +1,6 @@
-package com.hiscat.flink.custrom.connector.json.ogg;
+package com.hiscat.flink.custrom.format.json.ogg;
 
-import com.hiscat.flink.custrom.connector.json.ogg.OggJsonDeserializationSchema.MetadataConverter;
+import com.hiscat.flink.custrom.format.json.ogg.OggJsonDeserializationSchema.MetadataConverter;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.formats.common.TimestampFormat;
@@ -22,8 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.hiscat.flink.custrom.connector.json.ogg.OggJsonDeserializationSchema.*;
-import static com.hiscat.flink.custrom.connector.json.ogg.OggJsonDeserializationSchema.builder;
+import static com.hiscat.flink.custrom.format.json.ogg.OggJsonDeserializationSchema.builder;
 
 /**
  * {@link DecodingFormat} for Ogg using JSON encoding.

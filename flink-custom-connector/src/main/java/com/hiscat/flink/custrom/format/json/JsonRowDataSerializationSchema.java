@@ -1,4 +1,4 @@
-package com.hiscat.flink.custrom.connector.json;
+package com.hiscat.flink.custrom.format.json;
 
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.api.common.serialization.SerializationSchema;

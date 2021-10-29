@@ -1,1 +1,1 @@
-com.hiscat.flink.custrom.connector.json.ogg.OggJsonFormatFactory
+com.hiscat.flink.custrom.format.json.ogg.OggJsonFormatFactory
