@@ -2,21 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.hiscat</groupId>
         <artifactId>flink-demo</artifactId>
+        <groupId>com.hiscat</groupId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
-    <groupId>com.hiscat.flink.cdc</groupId>
-    <artifactId>flink-cdc-test</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>flink-hudi-test</artifactId>
 
     <properties>
-        <flink.version>1.13.2</flink.version>
-        <flink-connector-mysql-cdc.version>2.0.2</flink-connector-mysql-cdc.version>
-        <lettuce.version>6.1.5.RELEASE</lettuce.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <flink.version>1.12.2</flink.version>
+        <hudi.version>0.9.0</hudi.version>
     </properties>
     <dependencies>
         <!--required dependencies-->
@@ -28,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-planner-blink_2.11</artifactId>
+            <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -36,59 +35,36 @@
         <!--sql client dependencies-->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-sql-client_2.11</artifactId>
+            <artifactId>flink-sql-client_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-python_2.11</artifactId>
+            <artifactId>flink-python_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-runtime-web_2.11</artifactId>
+            <artifactId>flink-runtime-web_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-yarn_2.11</artifactId>
+            <artifactId>flink-yarn_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
 
-        <!--flink connector-->
+        <!--        hudi dependencies-->
         <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka_2.11</artifactId>
-            <version>${flink.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-jdbc_2.11</artifactId>
-            <version>${flink.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.ververica</groupId>
-            <artifactId>flink-connector-mysql-cdc</artifactId>
-            <version>${flink-connector-mysql-cdc.version}</version>
+            <groupId>org.apache.hudi</groupId>
+            <artifactId>hudi-flink-bundle_${scala.binary.version}</artifactId>
+            <version>${hudi.version}</version>
         </dependency>
 
-        <!--flink format-->
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-json</artifactId>
-            <version>${flink.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.lettuce</groupId>
-            <artifactId>lettuce-core</artifactId>
-            <version>${lettuce.version}</version>
-        </dependency>
 
         <!--log4j2-->
         <dependency>
@@ -102,6 +78,11 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-1.2-api</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
     </dependencies>
 </project>

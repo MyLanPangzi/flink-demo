@@ -13,6 +13,7 @@
         <module>flink-cdc-test</module>
         <module>flink-custom-connector</module>
         <module>flink-sql-submitter</module>
+        <module>flink-hudi-test</module>
     </modules>
 
     <properties>
@@ -50,6 +51,50 @@
                 <version>${flink.version}</version>
             </dependency>
 
+            <!--sql client dependencies-->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-sql-client_2.11</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-python_2.11</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-runtime-web_2.11</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-yarn_2.11</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!--flink connector-->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-kafka_2.11</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-jdbc_2.11</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.ververica</groupId>
+                <artifactId>flink-connector-mysql-cdc</artifactId>
+                <version>${flink-connector-mysql-cdc.version}</version>
+            </dependency>
 
             <!--log4j2-->
             <dependency>
