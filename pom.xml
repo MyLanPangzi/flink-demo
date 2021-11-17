@@ -14,6 +14,7 @@
         <module>flink-custom-connector</module>
         <module>flink-sql-submitter</module>
         <module>flink-hudi-test</module>
+        <module>flink-pb-test</module>
     </modules>
 
     <properties>
@@ -94,6 +95,12 @@
                 <groupId>com.ververica</groupId>
                 <artifactId>flink-connector-mysql-cdc</artifactId>
                 <version>${flink-connector-mysql-cdc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-hive_2.11</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!--log4j2-->
