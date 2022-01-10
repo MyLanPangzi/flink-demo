@@ -44,6 +44,14 @@ public class SqlRunnerOptions {
                 "Script file that should be executed. In this mode, "
                     + "the client will not open an interactive terminal.")
             .build();
+    public static final Option OPTION_ENABLE_HIVE =
+        Option.builder("h")
+            .required(false)
+            .longOpt("enable.hive")
+            .numberOfArgs(1)
+            .argName("enable hive")
+            .desc("enable hive catalog")
+            .build();
 
     public static final Option OPTION_MODE =
         Option.builder("m")
@@ -54,12 +62,22 @@ public class SqlRunnerOptions {
             .desc("execution mode test or prod")
             .build();
 
+    public static final Option OPTION_JOB_NAME =
+        Option.builder("jn")
+            .required(false)
+            .longOpt("job.name")
+            .numberOfArgs(1)
+            .argName("job name")
+            .desc("job name")
+            .build();
+
     public static final String TEST = "test";
 
     private String mode;
     private String initFile;
     private String sqlFile;
     private Boolean enableExternalSql;
+    private Boolean enableHiveSupport;
 
     public static SqlRunnerOptions parseFromArgs(String[] args) throws ParseException {
         final CommandLine cli = new DefaultParser()
@@ -67,7 +85,8 @@ public class SqlRunnerOptions {
                 new Options()
                     .addOption(OPTION_MODE)
                     .addOption(OPTION_FILE)
-                    .addOption(OPTION_EXTERNAL_SQL)
+                    .addOption(OPTION_JOB_NAME)
+                    .addOption(OPTION_ENABLE_HIVE)
                     .addOption(OPTION_EXTERNAL_SQL),
                 args,
                 false
@@ -78,6 +97,7 @@ public class SqlRunnerOptions {
             .initFile(cli.getOptionValue(OPTION_EXTERNAL_SQL.getOpt()))
             .mode(cli.getOptionValue(OPTION_MODE.getOpt(), TEST))
             .enableExternalSql(Boolean.valueOf(cli.getOptionValue(OPTION_EXTERNAL_SQL.getOpt(), "false")))
+            .enableHiveSupport(Boolean.valueOf(cli.getOptionValue(OPTION_ENABLE_HIVE.getOpt(), "false")))
             .build();
     }
 

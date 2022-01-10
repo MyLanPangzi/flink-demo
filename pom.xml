@@ -14,7 +14,8 @@
         <module>flink-custom-connector</module>
         <module>flink-sql-submitter</module>
         <module>flink-hudi-test</module>
-        <module>flink-pb-test</module>
+        <module>flink-hive-test</module>
+        <module>mysql2hudi</module>
     </modules>
 
     <properties>
@@ -23,7 +24,7 @@
 
         <flink.version>1.14.0</flink.version>
         <scala.binary.version>2.11</scala.binary.version>
-        <log4j.version>2.14.1</log4j.version>
+        <log4j.version>2.17.0</log4j.version>
         <lombok.version>1.18.20</lombok.version>
     </properties>
     <dependencies>
