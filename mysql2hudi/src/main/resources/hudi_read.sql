@@ -26,7 +26,7 @@ set state.backend=hashmap;
 CREATE CATALOG hudi WITH(
     'type' = 'hudi',
     'default-database' = 'test',
-    'catalog.path' = 'file:///Users/xiebo/IdeaProjects/winter/hudi'
+    'catalog.path' = 'file:///Users/xiebo/IdeaProjects/flink-demo/hudi'
 );
 
 CREATE TABLE print WITH('connector'='print') LIKE hudi.test.test(EXCLUDING ALL);

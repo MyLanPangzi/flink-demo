@@ -15,17 +15,17 @@ set state.backend=hashmap;
 -- SET 'execution.savepoint.path' = '/tmp/flink-savepoints/savepoint-cca7bc-bb1e257f0dab';
 
 CREATE CATALOG mysql WITH(
-    'type' = 'mysql',
+    'type' = 'mysql-cdc',
     'default-database' = 'test',
     'username' = 'root',
     'password' = '!QAZ2wsx',
-    'base-url' = 'jdbc:mysql://localhost:3306/'
+    'hostname' = 'localhost'
 );
 
 CREATE CATALOG hudi WITH(
     'type' = 'hudi',
     'default-database' = 'test',
-    'catalog.path' = 'file:///Users/xiebo/IdeaProjects/winter/hudi'
+    'catalog.path' = 'file:///Users/xiebo/IdeaProjects/flink-demo/hudi'
 );
 
 CREATE TABLE print WITH('connector'='print') LIKE mysql.test.test(EXCLUDING ALL);

@@ -1,5 +1,6 @@
 package com.hiscat.flink;
 
+import com.hiscat.flink.cli.CliStatementSplitter;
 import com.hiscat.flink.cli.SqlRunnerOptions;
 import com.hiscat.flink.function.CallContext;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,6 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.api.bridge.java.internal.StreamTableEnvironmentImpl;
 import org.apache.flink.table.catalog.hive.HiveCatalog;
-import org.apache.flink.table.client.cli.CliStatementSplitter;
 import org.apache.flink.table.delegation.Parser;
 import org.apache.flink.table.operations.CatalogSinkModifyOperation;
 import org.apache.flink.table.operations.ModifyOperation;

@@ -11,7 +11,6 @@ import org.apache.flink.table.catalog.Catalog;
 import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.catalog.ResolvedCatalogTable;
 
-import java.util.HashMap;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
@@ -36,36 +35,18 @@ public class SyncDbFunction implements Consumer<CallContext> {
 
         final String mysqlDb = srcCatalogDb[1];
         // create hudi table 1. if not exists create 2. exists merge :TODO
-        // create cdc table
         final StatementSet statementSet = tEnv.createStatementSet();
         mysql.listTables(mysqlDb).forEach(t -> {
             try {
-                final ResolvedCatalogTable mysqlTable = ((ResolvedCatalogTable) mysql.getTable(new ObjectPath(mysqlDb, t)));
-                final ObjectPath hudiTable = new ObjectPath(destCatalogDb[1], t);
-                hudi.createTable(hudiTable, new ResolvedCatalogTable(mysqlTable, mysqlTable.getResolvedSchema()), true);
-                final HashMap<String, String> options = makeCdcOptions(mysql, mysqlDb, t);
-                final ObjectPath cdcTable = new ObjectPath("default_database", t);
-                defaultCatalog.createTable(cdcTable, mysqlTable.copy(options), true);
-                statementSet.addInsertSql(String.format("INSERT INTO %s.%s SELECT * FROM %s", destCatalogName, hudiTable, cdcTable));
+                final ObjectPath cdcTablePath = new ObjectPath(mysqlDb, t);
+                final ResolvedCatalogTable mysqlTable = ((ResolvedCatalogTable) mysql.getTable(cdcTablePath));
+                hudi.createTable(new ObjectPath(destCatalogDb[1], t), new ResolvedCatalogTable(mysqlTable, mysqlTable.getResolvedSchema()), true);
+                statementSet.addInsertSql(String.format("INSERT INTO %s.%s SELECT * FROM %s.%s", destCatalogName, new ObjectPath(destCatalogDb[1], t), srcCatalogName, cdcTablePath.getFullName()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
         statementSet.execute();
-        tEnv.executeSql("show tables").print();
-//        sql.append("END;");
     }
 
-    private HashMap<String, String> makeCdcOptions(final MysqlCatalog mysql, final String mysqlDb, final String t) {
-        final HashMap<String, String> options = new HashMap<>();
-        options.put("connector", "mysql-cdc");
-        // TODO: obtain hostname port from url
-        options.put("hostname", "localhost");
-        options.put("port", "3306");
-        options.put("username", mysql.getUsername());
-        options.put("password", mysql.getPassword());
-        options.put("database-name", mysqlDb);
-        options.put("table-name", t);
-        return options;
-    }
 }

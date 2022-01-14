@@ -20,6 +20,8 @@ package com.hiscat.fink.catalog.mysql;
 
 import com.mysql.cj.MysqlType;
 import com.mysql.cj.jdbc.DatabaseMetaDataUsingInfoSchema;
+import com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions;
+import com.ververica.cdc.connectors.mysql.table.MySqlTableSourceFactory;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.connector.jdbc.catalog.AbstractJdbcCatalog;
 import org.apache.flink.table.api.DataTypes;
@@ -28,14 +30,18 @@ import org.apache.flink.table.catalog.*;
 import org.apache.flink.table.catalog.exceptions.CatalogException;
 import org.apache.flink.table.catalog.exceptions.DatabaseNotExistException;
 import org.apache.flink.table.catalog.exceptions.TableNotExistException;
+import org.apache.flink.table.factories.Factory;
 import org.apache.flink.table.types.AbstractDataType;
 import org.apache.flink.table.types.DataType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.util.*;
 
+import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions.*;
+import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions.PASSWORD;
+import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions.TABLE_NAME;
+import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions.USERNAME;
 import static org.apache.flink.connector.jdbc.table.JdbcDynamicTableFactory.*;
 import static org.apache.flink.table.factories.FactoryUtil.CONNECTOR;
 
@@ -44,12 +50,6 @@ import static org.apache.flink.table.factories.FactoryUtil.CONNECTOR;
  */
 @Internal
 public class MysqlCatalog extends AbstractJdbcCatalog {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MysqlCatalog.class);
-
-    public static final String DEFAULT_DATABASE = "mysql";
-
-    // ------ Postgres default objects that shouldn't be exposed to users ------
 
     private static final Set<String> builtinDatabases =
         new HashSet<String>() {
@@ -60,22 +60,31 @@ public class MysqlCatalog extends AbstractJdbcCatalog {
                 add("mysql");
             }
         };
+    public static final String IDENTIFIER = "mysql-cdc";
 
+    private final String hostname;
+    private final int port;
 
     protected MysqlCatalog(
         String catalogName,
         String defaultDatabase,
         String username,
-        String pwd,
-        String baseUrl) {
-        super(catalogName, defaultDatabase, username, pwd, baseUrl);
+        String pwd, final String hostname, final int port) {
+        super(catalogName, defaultDatabase, username, pwd, String.format("jdbc:mysql://%s:%d", hostname, port));
+        this.hostname = hostname;
+        this.port = port;
     }
 
     public static void main(String[] args) throws DatabaseNotExistException, TableNotExistException {
-        final MysqlCatalog catalog = new MysqlCatalog("mysql", "test", "root", "!QAZ2wsx", "jdbc:mysql://localhost:3306/");
+        final MysqlCatalog catalog = new MysqlCatalog("mysql", "test", "root", "!QAZ2wsx", "localhost", 3306);
         catalog.listDatabases().forEach(System.out::println);
         catalog.listTables("test").forEach(System.out::println);
         System.out.println(catalog.getTable(new ObjectPath("test", "test")).getOptions());
+    }
+
+    @Override
+    public Optional<Factory> getFactory() {
+        return Optional.of(new MySqlTableSourceFactory());
     }
     // ------ databases ------
 
@@ -173,12 +182,7 @@ public class MysqlCatalog extends AbstractJdbcCatalog {
             }
             primaryKeys.close();
 
-            Map<String, String> props = new HashMap<>();
-            props.put(CONNECTOR.key(), IDENTIFIER);
-            props.put(URL.key(), dbUrl);
-            props.put(TABLE_NAME.key(), tablePath.getObjectName());
-            props.put(USERNAME.key(), username);
-            props.put(PASSWORD.key(), pwd);
+            Map<String, String> props = makeCdcProps(tablePath);
 
             final Schema schema = builder.build();
             final Schema.UnresolvedPrimaryKey unresolvedPrimaryKey = schema.getPrimaryKey().orElseThrow(() -> new RuntimeException(tablePath + "no pk "));
@@ -221,6 +225,19 @@ public class MysqlCatalog extends AbstractJdbcCatalog {
         }
     }
 
+    @NotNull
+    private Map<String, String> makeCdcProps(final ObjectPath tablePath) {
+        Map<String, String> props = new HashMap<>();
+        props.put(CONNECTOR.key(), IDENTIFIER);
+        props.put(HOSTNAME.key(), hostname);
+        props.put(DATABASE_NAME.key(), tablePath.getDatabaseName());
+        props.put(TABLE_NAME.key(), tablePath.getObjectName());
+        props.put(USERNAME.key(), username);
+        props.put(PASSWORD.key(), pwd);
+        props.put(PORT.key(), String.valueOf(port));
+        return props;
+    }
+
     private AbstractDataType<?> getDataType(final String typeName) {
         final MysqlType mysqlType = MysqlType.getByName(typeName);
         switch (mysqlType) {
@@ -238,42 +255,10 @@ public class MysqlCatalog extends AbstractJdbcCatalog {
         }
     }
 
-    // Postgres jdbc driver maps several alias to real type, we use real type rather than alias:
-    // serial2 <=> int2
-    // smallserial <=> int2
-    // serial4 <=> serial
-    // serial8 <=> bigserial
-    // smallint <=> int2
-    // integer <=> int4
-    // int <=> int4
-    // bigint <=> int8
-    // float <=> float8
-    // boolean <=> bool
-    // decimal <=> numeric
-
-    /**
-     * Converts Postgres type to Flink {@link DataType}.
-     */
-    private DataType fromJDBCType(ResultSetMetaData metadata, int colIndex) throws SQLException {
-        String typeName = metadata.getColumnTypeName(colIndex);
-        System.out.println(typeName);
-        int precision = metadata.getPrecision(colIndex);
-        int scale = metadata.getScale(colIndex);
-        switch (typeName) {
-            case "BIGINT":
-                return DataTypes.BIGINT();
-            case "VARCHAR":
-                return DataTypes.STRING();
-            default:
-                throw new UnsupportedOperationException(
-                    String.format("Doesn't support Postgres type '%s' yet", typeName));
-        }
-    }
-
     @Override
     public boolean tableExists(ObjectPath tablePath) throws CatalogException {
 
-        List<String> tables = null;
+        List<String> tables;
         try {
             tables = listTables(tablePath.getDatabaseName());
         } catch (DatabaseNotExistException e) {
