@@ -40,8 +40,9 @@ public class SyncDbFunction implements Consumer<CallContext> {
             try {
                 final ObjectPath cdcTablePath = new ObjectPath(mysqlDb, t);
                 final ResolvedCatalogTable mysqlTable = ((ResolvedCatalogTable) mysql.getTable(cdcTablePath));
-                hudi.createTable(new ObjectPath(destCatalogDb[1], t), new ResolvedCatalogTable(mysqlTable, mysqlTable.getResolvedSchema()), true);
-                statementSet.addInsertSql(String.format("INSERT INTO %s.%s SELECT * FROM %s.%s", destCatalogName, new ObjectPath(destCatalogDb[1], t), srcCatalogName, cdcTablePath.getFullName()));
+                final ObjectPath hudiTablePath = new ObjectPath(destCatalogDb[1], t);
+                hudi.createTable(hudiTablePath, new ResolvedCatalogTable(mysqlTable, mysqlTable.getResolvedSchema()), true);
+                statementSet.addInsertSql(String.format("INSERT INTO %s.%s SELECT * FROM %s.%s", destCatalogName, hudiTablePath, srcCatalogName, cdcTablePath));
             } catch (Exception e) {
                 e.printStackTrace();
             }

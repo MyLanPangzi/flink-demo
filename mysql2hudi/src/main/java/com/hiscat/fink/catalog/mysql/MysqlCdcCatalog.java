@@ -38,9 +38,6 @@ import java.sql.*;
 import java.util.*;
 
 import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions.*;
-import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions.PASSWORD;
-import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions.TABLE_NAME;
-import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions.USERNAME;
 import static org.apache.flink.table.factories.FactoryUtil.CONNECTOR;
 
 /**
