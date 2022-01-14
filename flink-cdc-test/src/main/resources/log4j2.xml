@@ -1,11 +1,11 @@
 <Configuration status="warn" name="MyApp" packages="">
     <Appenders>
         <Console name="STDOUT" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%5p][%C][%d]: %m%n"/>
+            <PatternLayout pattern="[%d][%5p][%C]: %m%n"/>
         </Console>
     </Appenders>
     <Loggers>
-        <Root level="error">
+        <Root level="warn">
             <AppenderRef ref="STDOUT"/>
         </Root>
     </Loggers>

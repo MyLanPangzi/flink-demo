@@ -1,22 +1,22 @@
-SET sql-client.execution.result-mode=TABLEAU;
-SET 'execution.checkpointing.interval' = '3s';
+SET execution.checkpointing.interval=10s;
+SET table.exec.resource.default-parallelism=1;
 
-CREATE TABLE orders
+CREATE TABLE test
 (
-    order_id      INT,
-    order_date    TIMESTAMP(0),
-    customer_name STRING,
-    price         DECIMAL(10, 5),
-    product_id    INT,
-    order_status  BOOLEAN,
-    PRIMARY KEY (order_id) NOT ENFORCED
+
+    `id`   bigint PRIMARY KEY NOT ENFORCED,
+    `name` varchar(20) ,
+    `ts`   timestamp
 ) WITH (
      'connector' = 'mysql-cdc',
-     'hostname' = 'dev',
-     'port' = '3306',
-     'username' = 'hiscat',
+     'hostname' = 'localhost',
+     'username' = 'root',
      'password' = '!QAZ2wsx',
-     'database-name' = 'flink',
-     'table-name' = 'orders');
+     'database-name' = 'test',
+     'table-name' = 'test');
 
-SELECT * FROM orders;
+CREATE TABLE p WITH('connector' = 'print')LIKE test(EXCLUDING ALL);
+
+INSERT INTO p
+SELECT *
+FROM test;

@@ -1,7 +1,7 @@
 package com.hiscat.fink.catalog.mysql;
 
+import com.hiscat.flink.function.CallContext;
 import lombok.SneakyThrows;
-import net.qtt.winter.flink.sql.runner.function.CallContext;
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ConfigOptions;
 import org.apache.flink.configuration.Configuration;

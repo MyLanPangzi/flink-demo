@@ -14,8 +14,8 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <flink.version>1.13.2</flink.version>
-        <flink-connector-mysql-cdc.version>2.0.2</flink-connector-mysql-cdc.version>
+        <flink.version>1.13.3</flink.version>
+        <flink-connector-mysql-cdc.version>2.2-SNAPSHOT</flink-connector-mysql-cdc.version>
         <lettuce.version>6.1.5.RELEASE</lettuce.version>
     </properties>
     <dependencies>
@@ -85,11 +85,10 @@
             <version>${flink.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.lettuce</groupId>
-            <artifactId>lettuce-core</artifactId>
-            <version>${lettuce.version}</version>
+            <groupId>com.hiscat.flink</groupId>
+            <artifactId>flink-sql-submitter</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
-
         <!--log4j2-->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
