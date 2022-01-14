@@ -26,7 +26,7 @@ public class SyncDbFunction implements Consumer<CallContext> {
 
         final String[] srcCatalogDb = configuration.getString(SRC_DB).split("\\.");
         final String srcCatalogName = srcCatalogDb[0];
-        final MysqlCatalog mysql = (MysqlCatalog) tEnv.getCatalog(srcCatalogName).orElseThrow(() -> new RuntimeException(srcCatalogName + " catalog not exists"));
+        final MysqlCdcCatalog mysql = (MysqlCdcCatalog) tEnv.getCatalog(srcCatalogName).orElseThrow(() -> new RuntimeException(srcCatalogName + " catalog not exists"));
 
         final String[] destCatalogDb = configuration.getString(DEST_DB).split("\\.");
         final String destCatalogName = destCatalogDb[0];

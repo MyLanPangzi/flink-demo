@@ -20,7 +20,6 @@ package com.hiscat.fink.catalog.mysql;
 
 import com.mysql.cj.MysqlType;
 import com.mysql.cj.jdbc.DatabaseMetaDataUsingInfoSchema;
-import com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions;
 import com.ververica.cdc.connectors.mysql.table.MySqlTableSourceFactory;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.connector.jdbc.catalog.AbstractJdbcCatalog;
@@ -42,14 +41,13 @@ import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOption
 import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions.PASSWORD;
 import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions.TABLE_NAME;
 import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOptions.USERNAME;
-import static org.apache.flink.connector.jdbc.table.JdbcDynamicTableFactory.*;
 import static org.apache.flink.table.factories.FactoryUtil.CONNECTOR;
 
 /**
  * Catalog for Mysql.
  */
 @Internal
-public class MysqlCatalog extends AbstractJdbcCatalog {
+public class MysqlCdcCatalog extends AbstractJdbcCatalog {
 
     private static final Set<String> builtinDatabases =
         new HashSet<String>() {
@@ -65,7 +63,7 @@ public class MysqlCatalog extends AbstractJdbcCatalog {
     private final String hostname;
     private final int port;
 
-    protected MysqlCatalog(
+    protected MysqlCdcCatalog(
         String catalogName,
         String defaultDatabase,
         String username,
@@ -76,7 +74,7 @@ public class MysqlCatalog extends AbstractJdbcCatalog {
     }
 
     public static void main(String[] args) throws DatabaseNotExistException, TableNotExistException {
-        final MysqlCatalog catalog = new MysqlCatalog("mysql", "test", "root", "!QAZ2wsx", "localhost", 3306);
+        final MysqlCdcCatalog catalog = new MysqlCdcCatalog("mysql", "test", "root", "!QAZ2wsx", "localhost", 3306);
         catalog.listDatabases().forEach(System.out::println);
         catalog.listTables("test").forEach(System.out::println);
         System.out.println(catalog.getTable(new ObjectPath("test", "test")).getOptions());
