@@ -19,8 +19,37 @@
         <slf4j-log4j12.version>1.7.30</slf4j-log4j12.version>
         <commons-compress.version>1.21</commons-compress.version>
         <flink-connector-mysql-cdc.version>2.1.0</flink-connector-mysql-cdc.version>
+        <connect-json.version>2.7.0</connect-json.version>
+        <jackson.version>2.13.0</jackson.version>
+        <kafka-connect.version>7.0.1</kafka-connect.version>
     </properties>
     <dependencies>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.kafka</groupId>-->
+<!--            <artifactId>connect-json</artifactId>-->
+<!--            <version>${connect-json.version}</version>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-connect-avro-data</artifactId>
+            <version>${kafka-connect.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.hiscat.flink</groupId>
             <artifactId>flink-sql-submitter</artifactId>
@@ -108,12 +137,22 @@
                     <artifactId>slf4j-log4j12</artifactId>
                     <groupId>org.slf4j</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>jackson-databind</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
             <version>${avro.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jackson-databind</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -132,6 +171,14 @@
                 <exclusion>
                     <artifactId>avro</artifactId>
                     <groupId>org.apache.avro</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>kafka-clients</artifactId>
+                    <groupId>org.apache.kafka</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>flink-connector-kafka_2.11</artifactId>
+                    <groupId>org.apache.flink</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

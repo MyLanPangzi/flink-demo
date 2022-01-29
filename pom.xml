@@ -13,8 +13,6 @@
         <module>flink-cdc-test</module>
         <module>flink-custom-connector</module>
         <module>flink-sql-submitter</module>
-        <module>flink-hudi-test</module>
-        <module>flink-hive-test</module>
         <module>mysql2hudi</module>
     </modules>
 
