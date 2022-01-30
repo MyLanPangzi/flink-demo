@@ -41,9 +41,10 @@ import static com.ververica.cdc.connectors.mysql.source.config.MySqlSourceOption
 import static org.apache.flink.table.factories.FactoryUtil.CONNECTOR;
 
 /**
+ * TODO: mapping jdbc type to flink sql internal type
+ *
  * Catalog for Mysql.
  */
-@Internal
 public class MysqlCdcCatalog extends AbstractJdbcCatalog {
 
     private static final Set<String> builtinDatabases =

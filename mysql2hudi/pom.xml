@@ -35,6 +35,7 @@
             <version>${kafka-connect.version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -215,6 +216,11 @@
                     <groupId>org.eclipse.jetty</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-runtime-web_2.11</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>

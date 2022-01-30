@@ -17,6 +17,7 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.Schema;
+import org.apache.flink.table.api.StatementSet;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.catalog.Catalog;
 import org.apache.flink.table.catalog.ObjectPath;
@@ -31,15 +32,15 @@ import org.apache.flink.util.OutputTag;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static com.ververica.cdc.connectors.mysql.table.MySqlReadableMetadata.DATABASE_NAME;
 import static java.util.stream.Collectors.toList;
 
+/**
+ * TODO: per table config. per table sql. multiple table merge into one
+ */
 @SuppressWarnings("unused")
 public class SyncDbFunction implements Consumer<CallContext> {
     private static final ConfigOption<String> SRC_DB = ConfigOptions.key("custom.sync-db.source.db").stringType().noDefaultValue();
@@ -74,7 +75,8 @@ public class SyncDbFunction implements Consumer<CallContext> {
         final String mysqlDb = srcCatalogDb[1];
 
         final String[] destCatalogDb = configuration.getString(DEST_DB).split("\\.");
-        final Catalog hudi = tEnv.getCatalog(destCatalogDb[0]).orElseThrow(() -> new RuntimeException(destCatalogDb[0] + " catalog not exists"));
+        final String hudiCatalogName = destCatalogDb[0];
+        final Catalog hudi = tEnv.getCatalog(hudiCatalogName).orElseThrow(() -> new RuntimeException(hudiCatalogName + " catalog not exists"));
         final String hudiDb = destCatalogDb[1];
 
         Map<String, RowDataDebeziumDeserializeSchema> debeziumDeserializeSchemaMap = new HashMap<>();
@@ -88,7 +90,7 @@ public class SyncDbFunction implements Consumer<CallContext> {
                 final ObjectPath mysqlTablePath = new ObjectPath(mysqlDb, t);
                 final ResolvedCatalogTable mysqlTable = ((ResolvedCatalogTable) mysql.getTable(mysqlTablePath));
                 final String fullName = mysqlTablePath.getFullName();
-                hudi.createTable(new ObjectPath(hudiDb, t), new ResolvedCatalogTable(mysqlTable, mysqlTable.getResolvedSchema()), true);
+                hudi.createTable(new ObjectPath(hudiDb, t), new ResolvedCatalogTable(mysqlTable.copy(Collections.emptyMap()), mysqlTable.getResolvedSchema()), true);
                 debeziumDeserializeSchemaMap.put(
                     fullName,
                     RowDataDebeziumDeserializeSchema.newBuilder()
@@ -129,16 +131,20 @@ public class SyncDbFunction implements Consumer<CallContext> {
             .keyBy(SyncDbFunction::getKey)
             .process(new StringRowDataVoidKeyedProcessFunction(converterMap));
 
+        final StatementSet set = tEnv.createStatementSet();
         params.forEach(p -> {
             tEnv.createTemporaryView(p.table, process.getSideOutput(p.tag), p.schema);
-            tEnv.sqlQuery("select f0.* FROM " + p.table).executeInsert("hudi." + p.path.getFullName());
+            set.addInsertSql(String.format("INSERT INTO %s.%s SELECT f0.* FROM %s", hudiCatalogName, p.path.getFullName(), p.table));
+//            tEnv.sqlQuery("select f0.* FROM " + p.table).executeInsert("hudi." + p.path.getFullName());
         });
+        set.execute();
 
-        context.getEnv().execute();
+//        context.getEnv().execute();
     }
 
     private MySqlSource<RowData> getMySqlSource(final String[] srcCatalogDb, final MysqlCdcCatalog mysql, final Map<String, RowDataDebeziumDeserializeSchema> maps) {
 
+        // TODO: extract hostname port from url
         return MySqlSource.<RowData>builder()
             .hostname("localhost")
             .port(3306)
