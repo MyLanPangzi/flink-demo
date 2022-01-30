@@ -1,0 +1,14 @@
+CREATE TABLE `test`
+(
+    `uuid` bigint NOT NULL AUTO_INCREMENT,
+    `name` varchar(20) DEFAULT NULL,
+    `ts`   timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`uuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `t1`
+(
+    `id`   int NOT NULL AUTO_INCREMENT,
+    `name` varchar(20) DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
