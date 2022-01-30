@@ -3,18 +3,18 @@ package com.hiscat.fink.catalog.mysql;
 import com.hiscat.flink.function.CallContext;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.connectors.mysql.table.MySqlDeserializationConverterFactory;
-import com.ververica.cdc.connectors.mysql.table.MySqlReadableMetadata;
 import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
 import com.ververica.cdc.debezium.table.MetadataConverter;
 import com.ververica.cdc.debezium.table.RowDataDebeziumDeserializeSchema;
 import lombok.SneakyThrows;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ConfigOptions;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
+import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.Schema;
 import org.apache.flink.table.api.StatementSet;
@@ -22,6 +22,9 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.catalog.Catalog;
 import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.catalog.ResolvedCatalogTable;
+import org.apache.flink.table.catalog.exceptions.DatabaseNotExistException;
+import org.apache.flink.table.catalog.exceptions.TableAlreadyExistException;
+import org.apache.flink.table.catalog.exceptions.TableNotExistException;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.data.conversion.RowRowConverter;
 import org.apache.flink.table.data.utils.JoinedRowData;
@@ -31,12 +34,17 @@ import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static com.ververica.cdc.connectors.mysql.table.MySqlReadableMetadata.DATABASE_NAME;
+import static com.ververica.cdc.connectors.mysql.table.MySqlReadableMetadata.TABLE_NAME;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * TODO: per table config. per table sql. multiple table merge into one
@@ -79,67 +87,47 @@ public class SyncDbFunction implements Consumer<CallContext> {
         final Catalog hudi = tEnv.getCatalog(hudiCatalogName).orElseThrow(() -> new RuntimeException(hudiCatalogName + " catalog not exists"));
         final String hudiDb = destCatalogDb[1];
 
-        Map<String, RowDataDebeziumDeserializeSchema> debeziumDeserializeSchemaMap = new HashMap<>();
-        Map<String, RowRowConverter> converterMap = new HashMap<>();
-        List<SyncDbParams> params = new ArrayList<>();
+        final List<Tuple2<ObjectPath, ResolvedCatalogTable>> pathAndTable = getPathAndTable(mysql, mysqlDb);
+        createHudiTable(hudi, hudiDb, pathAndTable);
 
-//         动态分流写入
-        mysql.listTables(mysqlDb).forEach(t -> {
-            try {
-
-                final ObjectPath mysqlTablePath = new ObjectPath(mysqlDb, t);
-                final ResolvedCatalogTable mysqlTable = ((ResolvedCatalogTable) mysql.getTable(mysqlTablePath));
-                final String fullName = mysqlTablePath.getFullName();
-                hudi.createTable(new ObjectPath(hudiDb, t), new ResolvedCatalogTable(mysqlTable.copy(Collections.emptyMap()), mysqlTable.getResolvedSchema()), true);
-                debeziumDeserializeSchemaMap.put(
-                    fullName,
-                    RowDataDebeziumDeserializeSchema.newBuilder()
-                        .setPhysicalRowType((RowType) mysqlTable.getResolvedSchema().toPhysicalRowDataType().getLogicalType())
-                        .setUserDefinedConverterFactory(MySqlDeserializationConverterFactory.instance())
-                        .setMetadataConverters(new MetadataConverter[]{DATABASE_NAME.getConverter(),
-                            MySqlReadableMetadata.TABLE_NAME.getConverter(),
-                            MySqlReadableMetadata.OP_TS.getConverter()})
-                        .setResultTypeInfo(TypeInformation.of(RowData.class))
-                        .build()
-                );
-                converterMap.put(fullName, RowRowConverter.create(mysqlTable.getResolvedSchema().toPhysicalRowDataType()));
-                final OutputTag<Row> tag = new OutputTag<Row>(fullName) {
-                };
-                final List<DataTypes.Field> fields = mysqlTable.getResolvedSchema().getColumns()
-                    .stream().map(c -> DataTypes.FIELD(c.getName(), c.getDataType())).collect(toList());
-                final Schema schema = Schema.newBuilder()
-                    .column("f0", DataTypes.ROW(fields.toArray(new DataTypes.Field[]{}))).build();
-                final SyncDbParams p = SyncDbParams.builder()
-                    .table(t)
-                    .path(new ObjectPath(mysqlDb, t))
-                    .tag(tag)
-                    .schema(schema)
-
-                    .build();
-                params.add(p);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        final MySqlSource<RowData> source = getMySqlSource(srcCatalogDb, mysql, debeziumDeserializeSchemaMap);
-
+        final MySqlSource<RowData> source = getMySqlSource(srcCatalogDb, mysql, getDebeziumDeserializeSchemas(pathAndTable));
         final SingleOutputStreamOperator<Void> process = context.getEnv()
-            .fromSource(
-                source, WatermarkStrategy.noWatermarks(), "mysql"
-            )
-            .keyBy(SyncDbFunction::getKey)
-            .process(new StringRowDataVoidKeyedProcessFunction(converterMap));
-
+            .fromSource(source, WatermarkStrategy.noWatermarks(), "mysql").uid("mysql")
+            .process(new RowDataVoidProcessFunction(getConverters(pathAndTable))).uid("split stream").name("split stream");
         final StatementSet set = tEnv.createStatementSet();
-        params.forEach(p -> {
+        getParamsList(mysqlDb, pathAndTable).forEach(p -> {
             tEnv.createTemporaryView(p.table, process.getSideOutput(p.tag), p.schema);
             set.addInsertSql(String.format("INSERT INTO %s.%s SELECT f0.* FROM %s", hudiCatalogName, p.path.getFullName(), p.table));
-//            tEnv.sqlQuery("select f0.* FROM " + p.table).executeInsert("hudi." + p.path.getFullName());
         });
         set.execute();
 
-//        context.getEnv().execute();
+    }
+
+    @NotNull
+    private List<Tuple2<ObjectPath, ResolvedCatalogTable>> getPathAndTable(final MysqlCdcCatalog mysql, final String mysqlDb) throws DatabaseNotExistException {
+        return mysql.listTables(mysqlDb).stream().map(t -> {
+            final ObjectPath p = new ObjectPath(mysqlDb, t);
+            try {
+                return Tuple2.of(p, ((ResolvedCatalogTable) mysql.getTable(p)));
+            } catch (TableNotExistException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).collect(toList());
+    }
+
+    private void createHudiTable(final Catalog hudi, final String hudiDb, final List<Tuple2<ObjectPath, ResolvedCatalogTable>> pathAndTable) {
+        pathAndTable.forEach(e -> {
+            try {
+                // TODO: read external options hoodie-catalog.yml using context.getEnv().getCachedFiles()
+                final Map<String, String> options = Collections.emptyMap();
+                hudi.createTable(new ObjectPath(hudiDb, e.f0.getObjectName()), new ResolvedCatalogTable(e.f1.copy(options), e.f1.getResolvedSchema()), true);
+            } catch (TableAlreadyExistException ex) {
+                ex.printStackTrace();
+            } catch (DatabaseNotExistException ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 
     private MySqlSource<RowData> getMySqlSource(final String[] srcCatalogDb, final MysqlCdcCatalog mysql, final Map<String, RowDataDebeziumDeserializeSchema> maps) {
@@ -154,6 +142,43 @@ public class SyncDbFunction implements Consumer<CallContext> {
             .tableList(".*")
             .deserializer(new CompositeDebeziuDeserializationSchema(maps))
             .build();
+    }
+
+    @NotNull
+    private Map<String, RowDataDebeziumDeserializeSchema> getDebeziumDeserializeSchemas(final List<Tuple2<ObjectPath, ResolvedCatalogTable>> pathAndTable) {
+        return pathAndTable.stream().collect(toMap(e -> e.f0.toString(), e -> RowDataDebeziumDeserializeSchema.newBuilder()
+            .setPhysicalRowType((RowType) e.f1.getResolvedSchema().toPhysicalRowDataType().getLogicalType())
+            .setUserDefinedConverterFactory(MySqlDeserializationConverterFactory.instance())
+            .setMetadataConverters(new MetadataConverter[]{
+                TABLE_NAME.getConverter(),
+                DATABASE_NAME.getConverter()
+            })
+            .setResultTypeInfo(TypeInformation.of(RowData.class))
+            .build()));
+    }
+
+    @NotNull
+    private Map<String, RowRowConverter> getConverters(final List<Tuple2<ObjectPath, ResolvedCatalogTable>> pathAndTable) {
+        return pathAndTable.stream().collect(toMap(e -> e.f0.toString(), e -> RowRowConverter.create(e.f1.getResolvedSchema().toPhysicalRowDataType())));
+    }
+
+    @NotNull
+    private List<SyncDbParams> getParamsList(final String mysqlDb, final List<Tuple2<ObjectPath, ResolvedCatalogTable>> pathAndTable) {
+        return pathAndTable.stream().map(e -> {
+            final OutputTag<Row> tag = new OutputTag<Row>(e.f0.getFullName()) {
+            };
+            final List<DataTypes.Field> fields = e.f1.getResolvedSchema().getColumns()
+                .stream().map(c -> DataTypes.FIELD(c.getName(), c.getDataType())).collect(toList());
+            final Schema schema = Schema.newBuilder()
+                .column("f0", DataTypes.ROW(fields.toArray(new DataTypes.Field[]{}))).build();
+            return SyncDbParams.builder()
+                .table(e.f0.getObjectName())
+                .path(new ObjectPath(mysqlDb, e.f0.getObjectName()))
+                .tag(tag)
+                .schema(schema)
+
+                .build();
+        }).collect(toList());
     }
 
     private static class CompositeDebeziuDeserializationSchema implements DebeziumDeserializationSchema<RowData> {
@@ -179,19 +204,19 @@ public class SyncDbFunction implements Consumer<CallContext> {
         }
     }
 
-    private static class StringRowDataVoidKeyedProcessFunction extends KeyedProcessFunction<String, RowData, Void> {
+    private static class RowDataVoidProcessFunction extends ProcessFunction<RowData, Void> {
 
-        //        private transient Map<String, OutputTag<Row>> tags;
-        private Map<String, RowRowConverter> converters;
+        private final Map<String, RowRowConverter> converters;
 
-        public StringRowDataVoidKeyedProcessFunction(final Map<String, RowRowConverter> rowRowConverter) {
-            this.converters = rowRowConverter;
+        public RowDataVoidProcessFunction(final Map<String, RowRowConverter> converterMap) {
+            this.converters = converterMap;
         }
 
         @Override
-        public void processElement(final RowData value, final KeyedProcessFunction<String, RowData, Void>.Context ctx, final Collector<Void> out) throws Exception {
-            ctx.output(new OutputTag<Row>(ctx.getCurrentKey()) {
-            }, this.converters.get(ctx.getCurrentKey()).toExternal(value));
+        public void processElement(final RowData rowData, final ProcessFunction<RowData, Void>.Context ctx, final Collector<Void> out) throws Exception {
+            final String key = rowData.getString(rowData.getArity() - 1).toString() + "." + rowData.getString(rowData.getArity() - 2).toString();
+            ctx.output(new OutputTag<Row>(key) {
+            }, this.converters.get(key).toExternal(rowData));
         }
     }
 }
