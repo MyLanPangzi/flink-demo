@@ -1,13 +1,30 @@
 # flink-demo
 
-minimum code just run
+sql 代码混合执行
 
-see also org.apache.flink.table.client.SqlClient comment
-![run *.sql](image/how-to-run-sql.png)
+```sql
 
-## flink-ds-connector
+call com.hiscat.flink.cdc.function.MysqlCdcSourceRegister;
 
-DataStream API usage
+CREATE TABLE ods_binlog_default
+(
+    `key`   STRING,
+    `value` STRING,
+    `topic` STRING METADATA FROM 'topic'
+) WITH (
+    'connector' = 'route-kafka',
+    'topic' = 'ods_binlog_default',
+    'properties.bootstrap.servers' = 'localhost:9092',
+    'key.format' = 'raw',
+    'key.fields' = 'key',
+    'value.format' = 'raw',
+    'value.fields-include' = 'EXCEPT_KEY',
+    'properties.compression.type' = 'gzip',
+    'properties.linger.ms' = '1000'
+ );
 
-## flink-sql-connector
+INSERT INTO ods_binlog_default
+SELECT `key`, `value`, get_topic(`db`, `table`)
+FROM cdc;
 
+```
