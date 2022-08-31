@@ -1,0 +1,13 @@
+
+INSERT INTO mysql.{db}.{table}
+/*+ OPTIONS(
+  'sink.buffer-flush.max-rows' = '1000',
+  'sink.buffer-flush.interval' = '3s'
+  ) */
+SELECT *
+FROM hive.kafka.ods_{db}_{table}_cdc_realtime_debezium_json
+/*+ OPTIONS(
+  'properties.group.id' = 'ods_{db}_{table}_cdc_realtime_2_mysql'
+  ) */
+;
+

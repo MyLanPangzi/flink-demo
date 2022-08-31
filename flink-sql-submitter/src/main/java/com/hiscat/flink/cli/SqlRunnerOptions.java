@@ -14,96 +14,28 @@ import java.io.InputStream;
 @AllArgsConstructor
 public class SqlRunnerOptions {
 
-    public static final Option OPTION_EXTERNAL_SQL =
-        Option.builder("e")
-            .required(false)
-            .longOpt("enable.external.sql")
-            .numberOfArgs(1)
-            .argName("read external sql ")
-            .desc("Read SQL from external path don't from classpath.")
-            .build();
+  public static final Option OPTION_FILE =
+      Option.builder("f")
+          .required(false)
+          .longOpt("file")
+          .numberOfArgs(1)
+          .argName("script file")
+          .desc(
+              "Script file that should be executed. In this mode, "
+                  + "the client will not open an interactive terminal.")
+          .build();
 
-    public static final Option OPTION_INIT_FILE =
-        Option.builder("i")
-            .required(false)
-            .longOpt("init")
-            .numberOfArgs(1)
-            .argName("initialization file")
-            .desc(
-                "Script file that used to init the session context. "
-                    + "If get error in execution, the sql client will exit. Notice it's not allowed to add query or insert into the init file.")
-            .build();
+  private String sqlFile;
 
-    public static final Option OPTION_FILE =
-        Option.builder("f")
-            .required(false)
-            .longOpt("file")
-            .numberOfArgs(1)
-            .argName("script file")
-            .desc(
-                "Script file that should be executed. In this mode, "
-                    + "the client will not open an interactive terminal.")
-            .build();
-    public static final Option OPTION_ENABLE_HIVE =
-        Option.builder("h")
-            .required(false)
-            .longOpt("enable.hive")
-            .numberOfArgs(1)
-            .argName("enable hive")
-            .desc("enable hive catalog")
-            .build();
+  public static SqlRunnerOptions parseFromArgs(String[] args) throws ParseException {
+    final CommandLine cli =
+        new DefaultParser().parse(new Options().addOption(OPTION_FILE), args, true);
 
-    public static final Option OPTION_MODE =
-        Option.builder("m")
-            .required(false)
-            .longOpt("mode")
-            .numberOfArgs(1)
-            .argName("execute mode")
-            .desc("execution mode test or prod")
-            .build();
+    return SqlRunnerOptions.builder().sqlFile(cli.getOptionValue(OPTION_FILE.getOpt())).build();
+  }
 
-    public static final Option OPTION_JOB_NAME =
-        Option.builder("jn")
-            .required(false)
-            .longOpt("job.name")
-            .numberOfArgs(1)
-            .argName("job name")
-            .desc("job name")
-            .build();
-
-    public static final String TEST = "test";
-
-    private String mode;
-    private String initFile;
-    private String sqlFile;
-    private Boolean enableExternalSql;
-    private Boolean enableHiveSupport;
-
-    public static SqlRunnerOptions parseFromArgs(String[] args) throws ParseException {
-        final CommandLine cli = new DefaultParser()
-            .parse(
-                new Options()
-                    .addOption(OPTION_MODE)
-                    .addOption(OPTION_FILE)
-                    .addOption(OPTION_JOB_NAME)
-                    .addOption(OPTION_ENABLE_HIVE)
-                    .addOption(OPTION_EXTERNAL_SQL),
-                args,
-                false
-            );
-
-        return SqlRunnerOptions.builder()
-            .sqlFile(cli.getOptionValue(OPTION_FILE.getOpt()))
-            .initFile(cli.getOptionValue(OPTION_EXTERNAL_SQL.getOpt()))
-            .mode(cli.getOptionValue(OPTION_MODE.getOpt(), TEST))
-            .enableExternalSql(Boolean.valueOf(cli.getOptionValue(OPTION_EXTERNAL_SQL.getOpt(), "false")))
-            .enableHiveSupport(Boolean.valueOf(cli.getOptionValue(OPTION_ENABLE_HIVE.getOpt(), "false")))
-            .build();
-    }
-
-
-    public InputStream getSqlFileInputStreamFromClasspath() {
-        return this.getClass().getResourceAsStream(String.format("/%s/%s", mode, sqlFile));
-    }
-
+  public InputStream getSqlFileInputStreamFromClasspath() {
+    return this.getClass()
+        .getResourceAsStream(String.format("%s", sqlFile.replace("classpath:", "")));
+  }
 }

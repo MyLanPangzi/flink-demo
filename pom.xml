@@ -10,10 +10,8 @@
     <name>flink-demo</name>
     <packaging>pom</packaging>
     <modules>
-        <module>flink-cdc-test</module>
         <module>flink-custom-connector</module>
         <module>flink-sql-submitter</module>
-        <module>mysql2hudi</module>
     </modules>
 
     <properties>

@@ -1,0 +1,35 @@
+
+CREATE TABLE IF NOT EXISTS hive.kafka.ods_{db}_{table}_cdc_realtime
+(
+    before ROW (
+       {cols}
+        ),
+    after ROW (
+        {cols}
+        ),
+     source ROW (
+        ts_ms bigint,
+        db string,
+        `table` string
+        ),
+    ts_ms                bigint,
+    op                   string,
+
+    kafka_topic          string METADATA FROM 'topic',
+    kafka_partition      int METADATA FROM 'partition',
+    kafka_offset         bigint METADATA FROM 'offset',
+    kafka_timestamp      timestamp METADATA FROM 'timestamp',
+    kafka_timestamp_type string METADATA FROM 'timestamp-type',
+--     @formatter:off
+    proctime AS PROCTIME()
+--     @formatter:on
+) WITH (
+    'connector' = 'kafka',
+    'topic' = 'ods_{db}_{table}_cdc_realtime',
+    'properties.bootstrap.servers' = '',
+    'properties.group.id' = 'ods_{db}_{table}_cdc_realtime_2_hive',
+    'format' = 'json',
+    'scan.topic-partition-discovery.interval' = '60s',
+--     'scan.startup.mode' = 'earliest-offset',
+    'json.ignore-parse-errors' = 'true'
+ );

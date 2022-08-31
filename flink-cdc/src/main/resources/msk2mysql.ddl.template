@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS hive.kafka.ods_{db}_{table}_cdc_realtime_debezium_json
+(
+
+    `metadata_schema_name` STRING METADATA FROM 'value.source.database',
+    `metadata_table_name`  STRING METADATA FROM 'value.source.table',
+    `metadata_timestamp` TIMESTAMP_LTZ(3) METADATA FROM 'value.ingestion-timestamp',
+    `kafka_topic`          STRING METADATA FROM 'topic',
+    `kafka_partition`      INT METADATA FROM 'partition',
+    `kafka_offset`         BIGINT METADATA FROM 'offset',
+    `kafka_timestamp`      TIMESTAMP(3) METADATA FROM 'timestamp',
+    `kafka_timestamp_type` STRING METADATA FROM 'timestamp-type'
+)WITH (
+    'connector' = 'kafka',
+    'topic' = 'ods_{db}_{table}_cdc_realtime',
+    'properties.bootstrap.servers' = '',
+    'value.format' = 'debezium-json',
+    'value.debezium-json.ignore-parse-errors' = 'true',
+    'value.debezium-json.timestamp-format.standard' = 'ISO-8601',
+    'scan.topic-partition-discovery.interval' = '60s'
+ ) LIKE `{db}`.`{db}`.`{table}` (EXCLUDING ALL);
+

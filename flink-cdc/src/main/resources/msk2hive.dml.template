@@ -1,0 +1,23 @@
+
+INSERT INTO hive.ods.ods_{db}_{table}_realtime
+/*+ OPTIONS(
+  'sink.partition-commit.policy.kind'='metastore,success-file'
+  ) */
+SELECT {insert_cols},
+
+       source.db                                  AS metadata_schema_name,
+       source.`table`                             AS metadata_table_name,
+       mill_2_local_date_time_string(ts_ms)       AS metadata_timestamp,
+       op                                         AS metadata_operation,
+       mill_2_local_date_time_string(source.ts_ms)       AS metadata_operation_ts,
+       kafka_topic,
+       kafka_partition,
+       kafka_offset,
+       kafka_timestamp,
+       kafka_timestamp_type,
+       DATE_FORMAT(kafka_timestamp, 'yyyyMMdd') AS dt
+FROM hive.kafka.ods_{db}_{table}_cdc_realtime
+/*+ OPTIONS(
+  'properties.group.id' = 'ods_{db}_{table}_cdc_realtime_2_hive'
+  ) */
+;

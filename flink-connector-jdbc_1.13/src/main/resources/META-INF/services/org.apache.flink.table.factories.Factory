@@ -1,0 +1,2 @@
+com.hiscat.flink.connector.jdbc.table.RedshiftDynamicTableFactory
+com.hiscat.flink.connector.jdbc.table.PartialUpdateJdbcDynamicTableFactory

@@ -1,0 +1,56 @@
+jobmanager.rpc.address: 0.0.0.0
+jobmanager.memory.process.size: 4g
+taskmanager.memory.process.size: 4g
+taskmanager.numberOfTaskSlots: 4
+parallelism.default: 4
+
+env.yarn.conf.dir: /etc/hadoop/conf
+env.hadoop.conf.dir: /etc/hadoop/conf
+env.pid.dir: /var/run/flink
+
+fs.allowed-fallback-filesystems: s3
+
+jobmanager.execution.failover-strategy: region
+jobmanager.web.upload.dir: /var/lib/flink/upload
+
+yarn.properties-file.location: /var/lib/flink/yarn
+
+yarn.application-attempts: 10
+high-availability: zookeeper
+high-availability.zookeeper.quorum: ip-10-88-221-41.ap-southeast-1.compute.internal:2181,ip-10-88-221-52.ap-southeast-1.compute.internal:2181,ip-10-88-221-125.ap-southeast-1.compute.internal:2181
+high-availability.storageDir: hdfs:///user/flink/recovery
+high-availability.zookeeper.path.root: /flink
+
+classloader.check-leaked-classloader: false
+
+restart-strategy: fixed-delay
+restart-strategy.fixed-delay.attempts: 100
+restart-strategy.fixed-delay.delay: 1min
+
+execution.checkpointing.tolerable-failed-checkpoints: 100
+execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
+execution.checkpointing.interval: 1min
+execution.checkpointing.min-pause: 1min
+execution.checkpointing.timeout: 20min
+execution.checkpointing.unaligned: true
+execution.savepoint.ignore-unclaimed-state: true
+
+state.backend: hashmap
+state.checkpoint-storage: filesystem
+state.checkpoints.num-retained: 3
+state.backend.incremental: true
+heartbeat.timeout: 600000
+akka.ask.timeout: 10min
+taskmanager.slot.timeout: 10min
+client.timeout: 10min
+task.cancellation.timers.timeout: 600000
+task.cancellation.timeout: 600000
+env.java.opts:  -Dlog4j2.formatMsgNoLookups=true -verbose:gc -server -XX:+PrintGCDetails -XX:+PrintGCTimeStamps
+yarn.containers.vcores: 1
+cluster.registration.max-timeout: 300000
+cluster.registration.initial-timeout: 300000
+cluster.registration.error-delay: 30000
+metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
+metrics.reporter.prom.port: 9250-9350
+taskmanager.memory.managed.fraction: 0
+akka.retry-gate-closed-for: 10000

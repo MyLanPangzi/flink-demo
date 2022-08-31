@@ -1,0 +1,20 @@
+
+CREATE EXTERNAL TABLE IF NOT EXISTS hive.ods.ods_{db}_{table}_realtime
+(
+    {cols},
+
+    `metadata_schema_name`  string COMMENT '源库名',
+    `metadata_table_name`   string COMMENT '源表名',
+    `metadata_timestamp`    string COMMENT '源记录时间戳',
+    `metadata_operation`    string COMMENT '源记录操作类型',
+    `metadata_operation_ts` string COMMENT '源记录操作时间',
+    `kafka_topic`           string COMMENT 'Kafka-主题',
+    `kafka_partition`       int COMMENT 'Kafka-分区',
+    `kafka_offset`          bigint COMMENT 'Kafka-位移',
+    `kafka_timestamp`       timestamp COMMENT 'Kafka-时戳',
+    `kafka_timestamp_type`  string COMMENT 'Kafka-时戳类型'
+)
+    PARTITIONED BY (
+        `dt` string)
+    STORED AS PARQUET
+    TBLPROPERTIES ('parquet.compression' = 'SNAPPY');
