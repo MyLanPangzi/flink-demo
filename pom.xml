@@ -12,6 +12,7 @@
     <modules>
         <module>flink-custom-connector</module>
         <module>flink-sql-submitter</module>
+        <module>flink-prometheus</module>
     </modules>
 
     <properties>

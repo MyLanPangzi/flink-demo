@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.hiscat</groupId>
+        <artifactId>flink-demo</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.hiscat.flink</groupId>
+    <artifactId>flink-prometheus</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <prometheus.version>0.8.1</prometheus.version>
+        <flink.version>1.13.1</flink.version>
+        <maven-shade-plugin.version>3.1.1</maven-shade-plugin.version>
+        <flink-shaded-zookeeper-3.version>3.5.10-16.1</flink-shaded-zookeeper-3.version>
+        <scala.binary.version>2.12</scala.binary.version>
+        <curator.version>4.2.0</curator.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-metrics-prometheus_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-annotations</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-metrics-core</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-core</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-shaded-zookeeper-3</artifactId>
+            <version>${flink-shaded-zookeeper-3.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient</artifactId>
+            <version>${prometheus.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_httpserver</artifactId>
+            <version>${prometheus.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_pushgateway</artifactId>
+            <version>${prometheus.version}</version>
+        </dependency>
+
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven-shade-plugin.version}</version>
+                <configuration>
+                    <!-- This section contains the core configuration that is applied to every jar that we create.-->
+                    <filters combine.children="append">
+                        <filter>
+                            <artifact>*</artifact>
+                            <excludes>
+                                <!-- Globally exclude log4j.properties from our JAR files. -->
+                                <exclude>log4j.properties</exclude>
+                                <exclude>log4j2.properties</exclude>
+                                <exclude>log4j-test.properties</exclude>
+                                <exclude>log4j2-test.properties</exclude>
+                                <!-- Do not copy the signatures in the META-INF folder.
+                                Otherwise, this might cause SecurityExceptions when using the JAR. -->
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                                <!-- META-INF/maven can contain 2 things:
+                                    - For archetypes, it contains an archetype-metadata.xml.
+                                    - For other jars, it contains the pom for all dependencies under the respective <groupId>/<artifactId>/ directory.
+
+                                     We want to exclude the poms because they may be under an incompatible license,
+                                     however the archetype metadata is required and we need to keep that around.
+
+                                     This pattern excludes directories under META-INF/maven.
+                                     ('?*/**' does not work because '**' also matches zero directories;
+                                     everything that matches '?*' also matches '?*/**')
+
+                                    The initial '**' allows the pattern to also work for multi-release jars that may contain such entries under
+                                    'META-INF/versions/11/META-INF/maven/'.
+                                     -->
+                                <exclude>**/META-INF/maven/?*/?*/**</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                    <transformers combine.children="append">
+                        <!-- The service transformer is needed to merge META-INF/services files -->
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                        <!-- The ApacheNoticeResourceTransformer collects and aggregates NOTICE files -->
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                            <projectName>Apache Flink</projectName>
+                            <encoding>UTF-8</encoding>
+                        </transformer>
+                    </transformers>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>shade-flink</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>io.prometheus:*</include>
+                                    <include>org.apache.flink:*</include>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>
