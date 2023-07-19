@@ -23,7 +23,8 @@ public abstract class BaseZookeeperServiceDiscovery implements ServiceDiscovery 
     @Override
     public void register(InetSocketAddress address, Properties properties) {
         initClient(properties);
-        registerNode(address, properties);
+        // 增加个1min重试，如果路径存在，拿一下zknode的内容和本地的地址和端口比对一下，如果一致，就不用注册临时节点，如果不一致，删掉重新注册，实现推空保护
+        registerNodeWithRetry(address, properties);
     }
 
     private void initClient(Properties properties) {
@@ -31,7 +32,46 @@ public abstract class BaseZookeeperServiceDiscovery implements ServiceDiscovery 
         client = CuratorFrameworkFactory.newClient(properties.getProperty(ZK_QUORUM.key()), retryPolicy);
         client.start();
     }
+    private void registerNodeWithRetry(InetSocketAddress address, Properties properties) throws InterruptedException {
+        int retryInterval = 60 * 1000; // 1 minute
+        int maxRetries = 10; // to prevent infinite retries
 
+        for (int i = 0; i < maxRetries; i++) {
+            try {
+                String path = makePath(properties);
+                Stat stat = client.checkExists().forPath(path);
+                if (stat != null) {
+                    byte[] data = client.getData().forPath(path);
+                    String nodeContent = new String(data, StandardCharsets.UTF_8);
+                    String expectedContent = new String(makeServerSetData(address), StandardCharsets.UTF_8);
+                    if (nodeContent.equals(expectedContent)) {
+                        return;
+                    } else {
+                        client.delete().forPath(path);
+                    }
+                }
+
+                client
+                        .create()
+                        .creatingParentsIfNeeded()
+                        .withMode(getCreateMode())
+                        .forPath(path, makeServerSetData(address));
+                return;
+            } catch (KeeperException.NodeExistsException e) {
+                // ignore and retry
+            } catch (Exception e) {
+                if(i == maxRetries - 1) {
+                    throw new RuntimeException("Failed to register node after " + maxRetries + " attempts: " + e.getMessage(), e);
+                }
+                // Log warning
+            }
+
+            Thread.sleep(retryInterval);
+        }
+
+        throw new InterruptedException("Node registration interrupted");
+    }
+    
 
     private void registerNode(InetSocketAddress address, Properties properties) {
         try {
