@@ -7,12 +7,16 @@ import org.apache.flink.shaded.curator5.org.apache.curator.framework.CuratorFram
 import org.apache.flink.shaded.curator5.org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.flink.shaded.curator5.org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.flink.shaded.zookeeper3.org.apache.zookeeper.CreateMode;
+import org.apache.flink.shaded.zookeeper3.org.apache.zookeeper.KeeperException;
 import org.apache.flink.shaded.zookeeper3.org.apache.zookeeper.data.Stat;
 
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.hiscat.flink.prometheus.sd.ZookeeperServiceDiscoveryOptions.ZK_QUORUM;
 
@@ -20,10 +24,26 @@ public abstract class BaseZookeeperServiceDiscovery implements ServiceDiscovery 
 
     private CuratorFramework client;
 
+    // 定时器实例
+    private ScheduledExecutorService scheduler; // Timer instance
+
     @Override
     public void register(InetSocketAddress address, Properties properties) {
         initClient(properties);
-        registerNode(address, properties);
+        try {
+            registerNodeWithRetry(address, properties);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        // Schedule the registerNodeWithRetry method to run every minute
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                registerNodeWithRetry(address, properties);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }, 0, 1, TimeUnit.MINUTES);
     }
 
     private void initClient(Properties properties) {
@@ -32,6 +52,46 @@ public abstract class BaseZookeeperServiceDiscovery implements ServiceDiscovery 
         client.start();
     }
 
+
+    private void registerNodeWithRetry(InetSocketAddress address, Properties properties) throws InterruptedException {
+        int retryInterval = 60 * 1000; // 1 minute
+        int maxRetries = 10; // to prevent infinite retries
+
+        for (int i = 0; i < maxRetries; i++) {
+            try {
+                String path = makePath(properties);
+                Stat stat = client.checkExists().forPath(path);
+                if (stat != null) {
+                    byte[] data = client.getData().forPath(path);
+                    String nodeContent = new String(data, StandardCharsets.UTF_8);
+                    String expectedContent = new String(makeServerSetData(address), StandardCharsets.UTF_8);
+                    if (nodeContent.equals(expectedContent)) {
+                        return;
+                    } else {
+                        client.delete().forPath(path);
+                    }
+                }
+
+                client
+                        .create()
+                        .creatingParentsIfNeeded()
+                        .withMode(getCreateMode())
+                        .forPath(path, makeServerSetData(address));
+                return;
+            } catch (KeeperException.NodeExistsException e) {
+                // ignore and retry
+            } catch (Exception e) {
+                if(i == maxRetries - 1) {
+                    throw new RuntimeException("Failed to register node after " + maxRetries + " attempts: " + e.getMessage(), e);
+                }
+                // Log warning
+            }
+
+            Thread.sleep(retryInterval);
+        }
+
+        throw new InterruptedException("Node registration interrupted");
+    }
 
     private void registerNode(InetSocketAddress address, Properties properties) {
         try {
@@ -90,6 +150,9 @@ public abstract class BaseZookeeperServiceDiscovery implements ServiceDiscovery 
 
     @Override
     public void close() {
+        if (scheduler != null) {
+            scheduler.shutdown();
+        }
         client.close();
     }
 }
